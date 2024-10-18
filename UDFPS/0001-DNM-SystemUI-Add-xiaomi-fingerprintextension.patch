@@ -1,4 +1,4 @@
-From 32c8f5d6becfd3521ff0946a945beb8ff1476b36 Mon Sep 17 00:00:00 2001
+From aba38e267764c96aa4fb1066ec026cf6e7de37de Mon Sep 17 00:00:00 2001
 From: MrTopia <redkarmakar@gmail.com>
 Date: Wed, 14 Aug 2024 14:18:23 +0530
 Subject: [PATCH] DNM: SystemUI: Add xiaomi fingerprintextension and
@@ -11,7 +11,7 @@ Subject: [PATCH] DNM: SystemUI: Add xiaomi fingerprintextension and
  3 files changed, 60 insertions(+)
 
 diff --git a/packages/SystemUI/Android.bp b/packages/SystemUI/Android.bp
-index 6e0ad71b26d4..c633088cefe2 100644
+index 6e0ad71..c633088 100644
 --- a/packages/SystemUI/Android.bp
 +++ b/packages/SystemUI/Android.bp
 @@ -526,6 +526,8 @@ android_library {
@@ -24,10 +24,10 @@ index 6e0ad71b26d4..c633088cefe2 100644
      libs: [
          "keepanno-annotations",
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-index cda80df005ab..7746c82166a9 100644
+index 36ed7ce..262a17c 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-@@ -125,6 +125,9 @@ import java.util.concurrent.Executor;
+@@ -128,6 +128,9 @@ import java.util.concurrent.Executor;
  
  import javax.inject.Inject;
  
@@ -37,7 +37,7 @@ index cda80df005ab..7746c82166a9 100644
  /**
   * Shows and hides the under-display fingerprint sensor (UDFPS) overlay, handles UDFPS touch events,
   * and toggles the UDFPS display mode.
-@@ -188,6 +191,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+@@ -192,6 +195,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
      private final boolean mIgnoreRefreshRate;
      private final KeyguardTransitionInteractor mKeyguardTransitionInteractor;
  
@@ -47,9 +47,9 @@ index cda80df005ab..7746c82166a9 100644
      // Currently the UdfpsController supports a single UDFPS sensor. If devices have multiple
      // sensors, this, in addition to a lot of the code here, will be updated.
      @VisibleForTesting @NonNull FingerprintSensorPropertiesInternal mSensorProps;
-@@ -261,6 +267,50 @@ public class UdfpsController implements DozeReceiver, Dumpable {
-         }
-     };
+@@ -285,6 +291,50 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+                 }
+             };
  
 +    private static void xaiomiTouchFeature(int arg) {
 +        try {
@@ -98,7 +98,7 @@ index cda80df005ab..7746c82166a9 100644
      @Override
      public void dump(@NonNull PrintWriter pw, @NonNull String[] args) {
          final int touchConfigId = mContext.getResources().getInteger(
-@@ -1168,6 +1218,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+@@ -1221,6 +1271,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
              }
          }
  
@@ -108,7 +108,7 @@ index cda80df005ab..7746c82166a9 100644
          for (Callback cb : mCallbacks) {
              cb.onFingerDown();
          }
-@@ -1215,6 +1268,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+@@ -1275,6 +1328,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
          unconfigureDisplay(view);
          cancelAodSendFingerUpAction();
  
@@ -119,13 +119,13 @@ index cda80df005ab..7746c82166a9 100644
          // to switch out of HBM mode. The delay, in ms is stored in config_udfpsDimmingDisableDelay.
          // If the delay is 0, the dim amount will be updated immediately.
 diff --git a/services/core/Android.bp b/services/core/Android.bp
-index f40b2d713561..56bc93c24a4f 100644
+index 4e2b649..0b907d2 100644
 --- a/services/core/Android.bp
 +++ b/services/core/Android.bp
-@@ -229,6 +229,8 @@ java_library_static {
-         "aconfig_new_storage_flags_lib",
+@@ -230,6 +230,8 @@ java_library_static {
          "powerstats_flags_lib",
          "vendor.aac.hardware.richtap.vibrator",
+         "vendor.aospa.biometrics.face",
 +        "vendor.xiaomi.hardware.fingerprintextension-V1-java",
 +        "vendor.xiaomi.hw.touchfeature-V1-java",
      ],
