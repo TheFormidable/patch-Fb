@@ -1,0 +1,76 @@
+From a786d84a4cd63fa9aeeb2e9325357fc5ff8c4312 Mon Sep 17 00:00:00 2001
+From: HELLBOY017 <abhaygill017@gmail.com>
+Date: Tue, 24 May 2022 10:59:59 +0530
+Subject: [PATCH] Add AC4Tbl params for dolby AC4 decoder [2/2]
+
+Signed-off-by: Pranav Vashi <neobuddy89@gmail.com>
+Signed-off-by: tejas101k <tejassingh649@rediffmail.com>
+---
+ .../media_plugin/media/openmax/OMX_AsString.h |  1 +
+ .../media_plugin/media/openmax/OMX_AudioExt.h | 25 +++++++++++++++++++
+ .../media_plugin/media/openmax/OMX_IndexExt.h |  1 +
+ 3 files changed, 27 insertions(+)
+
+diff --git a/headers/media_plugin/media/openmax/OMX_AsString.h b/headers/media_plugin/media/openmax/OMX_AsString.h
+index 165a868..d0141fd 100644
+--- a/headers/media_plugin/media/openmax/OMX_AsString.h
++++ b/headers/media_plugin/media/openmax/OMX_AsString.h
+@@ -540,6 +540,7 @@ inline static const char *asString(OMX_INDEXEXTTYPE i, const char *def = "??") {
+         case OMX_IndexParamAudioAndroidAacPresentation: return "ParamAudioAndroidAacPresentation";
+         case OMX_IndexParamAudioAndroidEac3:            return "ParamAudioAndroidEac3";
+         case OMX_IndexParamAudioAndroidAc4:             return "ParamAudioAndroidAc4";
++        case OMX_IndexParamAudioAndroidAc4Tbl:          return "ParamAudioAndroidAc4Tbl";
+         case OMX_IndexParamAudioProfileQuerySupported:  return "ParamAudioProfileQuerySupported";
+ //      case OMX_IndexParamNalStreamFormatSupported:    return "ParamNalStreamFormatSupported";
+ //      case OMX_IndexParamNalStreamFormat:             return "ParamNalStreamFormat";
+diff --git a/headers/media_plugin/media/openmax/OMX_AudioExt.h b/headers/media_plugin/media/openmax/OMX_AudioExt.h
+index b66efce..103c0d5 100644
+--- a/headers/media_plugin/media/openmax/OMX_AudioExt.h
++++ b/headers/media_plugin/media/openmax/OMX_AudioExt.h
+@@ -78,6 +78,31 @@ typedef struct OMX_AUDIO_PARAM_ANDROID_AC4TYPE {
+                                         variable or unknown sampling rate. */
+ } OMX_AUDIO_PARAM_ANDROID_AC4TYPE;
+ 
++#define OMX_LUT_BUFF_SZ 256
++#define OMX_B_C_SZ 80
++typedef struct OMX_AUDIO_PARAM_ANDROID_AC4TBL {
++    OMX_U32 nSize;
++    OMX_U8 seedA;
++    OMX_U8 seedB;
++    OMX_U8 seedC;
++
++    OMX_U8 idA;
++    OMX_U8 idB;
++    OMX_U8 idC;
++
++    OMX_U8 maskA;
++    OMX_U8 maskB;
++    OMX_U8 maskC;
++
++    OMX_U32 sizeA;
++    OMX_U32 sizeB;
++    OMX_U32 sizeC;
++
++    OMX_U8 bufferA[OMX_LUT_BUFF_SZ];
++    OMX_U8 bufferB[OMX_B_C_SZ];
++    OMX_U8 bufferC[OMX_B_C_SZ];
++} OMX_AUDIO_PARAM_ANDROID_AC4TBL;
++
+ typedef struct OMX_AUDIO_PARAM_ANDROID_OPUSTYPE {
+     OMX_U32 nSize;            /**< size of the structure in bytes */
+     OMX_VERSIONTYPE nVersion; /**< OMX specification version information */
+diff --git a/headers/media_plugin/media/openmax/OMX_IndexExt.h b/headers/media_plugin/media/openmax/OMX_IndexExt.h
+index 5ddd719..ac58fb3 100644
+--- a/headers/media_plugin/media/openmax/OMX_IndexExt.h
++++ b/headers/media_plugin/media/openmax/OMX_IndexExt.h
+@@ -65,6 +65,7 @@ typedef enum OMX_INDEXEXTTYPE {
+     OMX_IndexParamAudioProfileQuerySupported,       /**< reference: OMX_AUDIO_PARAM_ANDROID_PROFILETYPE */
+     OMX_IndexParamAudioAndroidAacDrcPresentation,   /**< reference: OMX_AUDIO_PARAM_ANDROID_AACDRCPRESENTATIONTYPE */
+     OMX_IndexParamAudioAndroidAc4,                  /**< reference: OMX_AUDIO_PARAM_ANDROID_AC4TYPE */
++    OMX_IndexParamAudioAndroidAc4Tbl,               /**< reference: OMX_AUDIO_PARAM_ANDROID_AC4TBL */
+     OMX_IndexConfigAudioPresentation,               /**< reference: OMX_AUDIO_CONFIG_ANDROID_AUDIOPRESENTATION */
+     OMX_IndexExtAudioEndUnused,
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,22 @@
+From e6372c5eb3deb53c68b9dbe9273ace10721481da Mon Sep 17 00:00:00 2001
+From: johnmart19 <johnivan19999@gmail.com>
+Date: Wed, 8 Mar 2023 19:00:21 +0200
+Subject: [PATCH] Frameworks: Enable VoNR by default
+
+---
+ telephony/java/android/telephony/CarrierConfigManager.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/telephony/java/android/telephony/CarrierConfigManager.java b/telephony/java/android/telephony/CarrierConfigManager.java
+index 0dee3726f860..d88c84d3625b 100644
+--- a/telephony/java/android/telephony/CarrierConfigManager.java
++++ b/telephony/java/android/telephony/CarrierConfigManager.java
+@@ -10385,7 +10385,7 @@ private static PersistableBundle getDefaults() {
+         sDefaults.putBoolean(KEY_DISPLAY_NO_DATA_NOTIFICATION_ON_PERMANENT_FAILURE_BOOL, false);
+         sDefaults.putBoolean(KEY_UNTHROTTLE_DATA_RETRY_WHEN_TAC_CHANGES_BOOL, false);
+         sDefaults.putBoolean(KEY_VONR_SETTING_VISIBILITY_BOOL, true);
+-        sDefaults.putBoolean(KEY_VONR_ENABLED_BOOL, false);
++        sDefaults.putBoolean(KEY_VONR_ENABLED_BOOL, true);
+         sDefaults.putBoolean(KEY_VONR_ON_BY_DEFAULT_BOOL, true);
+         sDefaults.putIntArray(KEY_SUPPORTED_PREMIUM_CAPABILITIES_INT_ARRAY, new int[0]);
+         sDefaults.putLong(KEY_PREMIUM_CAPABILITY_NOTIFICATION_DISPLAY_TIMEOUT_MILLIS_LONG,

@@ -1,0 +1,71 @@
+From f32ac81cdcae08650501e087a3e1fea7cade7937 Mon Sep 17 00:00:00 2001
+From: Ted Bauer <tedbauer@google.com>
+Date: Wed, 6 Dec 2023 20:13:49 +0000
+Subject: [PATCH] Remove READ_DEVICE_CONFIG checks.
+
+Bug: 288298466
+Test: m
+Change-Id: Icb5bf605d41b1232e3a892f32d1932fb5e493d59
+Merged-In: I2d26474beef74c66571f26b83f2ae7da481a8bf3
+---
+ core/java/android/provider/Settings.java         | 16 ----------------
+ .../providers/settings/SettingsProvider.java     |  5 -----
+ 2 files changed, 21 deletions(-)
+
+diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
+index 7ccd68016c1e..ee31d088d25d 100644
+--- a/core/java/android/provider/Settings.java
++++ b/core/java/android/provider/Settings.java
+@@ -3447,7 +3447,6 @@ private static boolean isCallerExemptFromReadableRestriction() {
+         public ArrayMap<String, String> getStringsForPrefix(ContentResolver cr, String prefix,
+                 List<String> names) {
+             String namespace = prefix.substring(0, prefix.length() - 1);
+-            Config.enforceReadPermission(namespace);
+             ArrayMap<String, String> keyValues = new ArrayMap<>();
+             int currentGeneration = -1;
+             boolean needsGenerationTracker = false;
+@@ -19902,21 +19901,6 @@ public static int checkCallingOrSelfPermission(@NonNull @PermissionName String p
+                .getApplicationContext().checkCallingOrSelfPermission(permission);
+         }
+ 
+-        /**
+-         * Enforces READ_DEVICE_CONFIG permission if namespace is not one of public namespaces.
+-         * @hide
+-         */
+-        public static void enforceReadPermission(String namespace) {
+-            if (ActivityThread.currentApplication().getApplicationContext()
+-                    .checkCallingOrSelfPermission(Manifest.permission.READ_DEVICE_CONFIG)
+-                    != PackageManager.PERMISSION_GRANTED) {
+-                if (!DeviceConfig.getPublicNamespaces().contains(namespace)) {
+-                    throw new SecurityException("Permission denial: reading from settings requires:"
+-                        + Manifest.permission.READ_DEVICE_CONFIG);
+-                }
+-            }
+-        }
+-
+         private static void setMonitorCallbackAsUser(
+                 @NonNull @CallbackExecutor Executor executor,
+                 @NonNull ContentResolver resolver, @UserIdInt int userHandle,
+diff --git a/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java b/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java
+index 9be017ce6964..00f22c1ba4a0 100644
+--- a/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java
++++ b/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java
+@@ -1149,8 +1149,6 @@ private Setting getConfigSetting(String name) {
+             Slog.v(LOG_TAG, "getConfigSetting(" + name + ")");
+         }
+ 
+-        Settings.Config.enforceReadPermission(/*namespace=*/name.split("/")[0]);
+-
+         // Get the value.
+         synchronized (mLock) {
+             return mSettingsRegistry.getSettingLocked(SETTINGS_TYPE_CONFIG,
+@@ -1329,9 +1327,6 @@ private HashMap<String, String> getAllConfigFlags(@Nullable String prefix) {
+             Slog.v(LOG_TAG, "getAllConfigFlags() for " + prefix);
+         }
+ 
+-        Settings.Config.enforceReadPermission(
+-                prefix != null ? prefix.split("/")[0] : null);
+-
+         synchronized (mLock) {
+             // Get the settings.
+             SettingsState settingsState = mSettingsRegistry.getSettingsLocked(

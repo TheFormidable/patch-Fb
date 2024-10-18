@@ -1,0 +1,28 @@
+From 412c9028a07a1f6839295f972e527cd55924acec Mon Sep 17 00:00:00 2001
+From: Murat Kozan <muratkozan350@gmail.com>
+Date: Wed, 27 Dec 2023 19:29:15 +0300
+Subject: [PATCH] SettingsProvider: Resolve google gms configurator denials
+
+11-19 11:15:51.792  1830  8762 E DatabaseUtils: Writing exception to parcel
+11-19 11:15:51.792  1830  8762 E DatabaseUtils: java.lang.SecurityException: Permission denial to mutate flag, must have root, WRITE_DEVICE_CONFIG, or WRITE_ALLOWLISTED_DEVICE_CONFIG
+11-19 11:15:51.792  1830  8762 E DatabaseUtils: 	at com.android.providers.settings.SettingsProvider.enforceDeviceConfigWritePermission(SettingsProvider.java:2376)
+11-19 11:15:51.792  1830  8762 E DatabaseUtils: 	at com.android.providers.settings.SettingsProvider.mutateConfigSetting(SettingsProvider.java:1303)
+---
+ .../src/com/android/providers/settings/SettingsProvider.java   | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java b/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java
+index 6782cc073cc1..49f9cb92e0aa 100644
+--- a/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java
++++ b/packages/SettingsProvider/src/com/android/providers/settings/SettingsProvider.java
+@@ -2417,8 +2417,9 @@ private void enforceDeviceConfigWritePermission(
+                 Manifest.permission.WRITE_DEVICE_CONFIG)
+                 == PackageManager.PERMISSION_GRANTED;
+         boolean isRoot = Binder.getCallingUid() == Process.ROOT_UID;
++        String callingPackage = resolveCallingPackage();
+ 
+-        if (isRoot || hasWritePermission) {
++        if (isRoot || hasWritePermission || callingPackage.equals("com.google.android.gms")) {
+             return;
+         } else if (hasAllowlistPermission) {
+             for (String flag : flags) {

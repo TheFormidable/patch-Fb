@@ -1,0 +1,136 @@
+From 32c8f5d6becfd3521ff0946a945beb8ff1476b36 Mon Sep 17 00:00:00 2001
+From: MrTopia <redkarmakar@gmail.com>
+Date: Wed, 14 Aug 2024 14:18:23 +0530
+Subject: [PATCH] DNM: SystemUI: Add xiaomi fingerprintextension and
+ touchfeature calls
+
+---
+ packages/SystemUI/Android.bp                  |  2 +
+ .../systemui/biometrics/UdfpsController.java  | 56 +++++++++++++++++++
+ services/core/Android.bp                      |  2 +
+ 3 files changed, 60 insertions(+)
+
+diff --git a/packages/SystemUI/Android.bp b/packages/SystemUI/Android.bp
+index 6e0ad71b26d4..c633088cefe2 100644
+--- a/packages/SystemUI/Android.bp
++++ b/packages/SystemUI/Android.bp
+@@ -526,6 +526,8 @@ android_library {
+         "device_policy_aconfig_flags_lib",
+         "vendor.lineage.powershare-V1.0-java",
+         "bcsmartspace-google",
++        "vendor.xiaomi.hardware.fingerprintextension-V1-java",
++        "vendor.xiaomi.hw.touchfeature-V1-java"
+     ],
+     libs: [
+         "keepanno-annotations",
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+index cda80df005ab..7746c82166a9 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+@@ -125,6 +125,9 @@ import java.util.concurrent.Executor;
+ 
+ import javax.inject.Inject;
+ 
++import vendor.xiaomi.hardware.fingerprintextension.IXiaomiFingerprint;
++import vendor.xiaomi.hw.touchfeature.ITouchFeature;
++
+ /**
+  * Shows and hides the under-display fingerprint sensor (UDFPS) overlay, handles UDFPS touch events,
+  * and toggles the UDFPS display mode.
+@@ -188,6 +191,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+     private final boolean mIgnoreRefreshRate;
+     private final KeyguardTransitionInteractor mKeyguardTransitionInteractor;
+ 
++    private static ITouchFeature xaiomiTouchFeatureAidl = null;
++    private static IXiaomiFingerprint xaiomiFingerprintExtensionAidl = null;
++
+     // Currently the UdfpsController supports a single UDFPS sensor. If devices have multiple
+     // sensors, this, in addition to a lot of the code here, will be updated.
+     @VisibleForTesting @NonNull FingerprintSensorPropertiesInternal mSensorProps;
+@@ -261,6 +267,50 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         }
+     };
+ 
++    private static void xaiomiTouchFeature(int arg) {
++        try {
++            if (xaiomiTouchFeatureAidl == null) {
++                var name = "default";
++                var fqName = vendor.xiaomi.hw.touchfeature.ITouchFeature.DESCRIPTOR + "/" + name;
++                var b = android.os.Binder.allowBlocking(android.os.ServiceManager.waitForDeclaredService(fqName));
++                xaiomiTouchFeatureAidl = vendor.xiaomi.hw.touchfeature.ITouchFeature.Stub.asInterface(b);
++
++                // Link to death
++                b.linkToDeath(() -> {
++                    android.util.Log.w("FP-HAX", "TouchFeature binder died. Reconnecting...");
++                    xaiomiTouchFeatureAidl = null;
++                }, 0);
++
++                android.util.Log.d("FP-HAX", "Binded TouchFeature");
++            }
++            xaiomiTouchFeatureAidl.setTouchMode(0, 10, arg);
++        } catch(Throwable t) {
++            android.util.Log.e("FP-HAX", "TouchFeature", t);
++        }
++    }
++
++    private static void xiaomiFingerprintExtension(int arg) {
++        try {
++            if (xaiomiFingerprintExtensionAidl == null) {
++                var name = "default";
++                var fqName = vendor.xiaomi.hardware.fingerprintextension.IXiaomiFingerprint.DESCRIPTOR + "/" + name;
++                var b = android.os.Binder.allowBlocking(android.os.ServiceManager.waitForDeclaredService(fqName));
++                xaiomiFingerprintExtensionAidl = vendor.xiaomi.hardware.fingerprintextension.IXiaomiFingerprint.Stub.asInterface(b);
++
++                // Link to death
++                b.linkToDeath(() -> {
++                    android.util.Log.w("FP-HAX", "FingerprintExtension binder died. Reconnecting...");
++                    xaiomiFingerprintExtensionAidl = null;
++                }, 0);
++
++                android.util.Log.d("FP-HAX", "Binded FingerprintExtension");
++            }
++            xaiomiFingerprintExtensionAidl.extCmd(4, arg);
++        } catch(Throwable t) {
++            android.util.Log.e("FP-HAX", "FingerprintExtension", t);
++        }
++    }
++
+     @Override
+     public void dump(@NonNull PrintWriter pw, @NonNull String[] args) {
+         final int touchConfigId = mContext.getResources().getInteger(
+@@ -1168,6 +1218,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+             }
+         }
+ 
++        xaiomiTouchFeature(1);
++        xiaomiFingerprintExtension(1);
++
+         for (Callback cb : mCallbacks) {
+             cb.onFingerDown();
+         }
+@@ -1215,6 +1268,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         unconfigureDisplay(view);
+         cancelAodSendFingerUpAction();
+ 
++        xaiomiTouchFeature(0);
++        xiaomiFingerprintExtension(0);
++
+         // Add a delay to ensure that the dim amount is updated after the display has had chance
+         // to switch out of HBM mode. The delay, in ms is stored in config_udfpsDimmingDisableDelay.
+         // If the delay is 0, the dim amount will be updated immediately.
+diff --git a/services/core/Android.bp b/services/core/Android.bp
+index f40b2d713561..56bc93c24a4f 100644
+--- a/services/core/Android.bp
++++ b/services/core/Android.bp
+@@ -229,6 +229,8 @@ java_library_static {
+         "aconfig_new_storage_flags_lib",
+         "powerstats_flags_lib",
+         "vendor.aac.hardware.richtap.vibrator",
++        "vendor.xiaomi.hardware.fingerprintextension-V1-java",
++        "vendor.xiaomi.hw.touchfeature-V1-java",
+     ],
+     javac_shard_size: 50,
+     javacflags: [
+-- 
+2.34.1
+

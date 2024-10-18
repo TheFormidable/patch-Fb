@@ -1,0 +1,40 @@
+From a1390cbf1c76aa309db3116f856c35854c1dc619 Mon Sep 17 00:00:00 2001
+From: Aman Singh <amankumarsingh1412@gmail.com>
+Date: Sat, 1 Jun 2024 20:10:02 +0530
+Subject: [PATCH] base: Update `lint-baseline.txt`
+
+---
+ core/api/current.txt       | 4 ++++
+ core/api/lint-baseline.txt | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/core/api/current.txt b/core/api/current.txt
+index 62980ed5bd699..859db5ce1af28 100644
+--- a/core/api/current.txt
++++ b/core/api/current.txt
+@@ -2349,6 +2349,10 @@ package android {
+     field public static final int zoom_plate = 17301655; // 0x1080097
+   }
+ 
++  public static final class R.font {
++    ctor public R.font();
++  }
++
+   public static final class R.fraction {
+     ctor public R.fraction();
+   }
+diff --git a/core/api/lint-baseline.txt b/core/api/lint-baseline.txt
+index 1b0da055038d9..7ccaf8046dda5 100644
+--- a/core/api/lint-baseline.txt
++++ b/core/api/lint-baseline.txt
+@@ -1169,6 +1169,10 @@ UnflaggedApi: android.R.dimen#system_corner_radius_xlarge:
+     New API must be flagged with @FlaggedApi: field android.R.dimen.system_corner_radius_xlarge
+ UnflaggedApi: android.R.dimen#system_corner_radius_xsmall:
+     New API must be flagged with @FlaggedApi: field android.R.dimen.system_corner_radius_xsmall
++UnflaggedApi: android.R.font:
++    New API must be flagged with @FlaggedApi: class android.R.font
++UnflaggedApi: android.R.font#font():
++    New API must be flagged with @FlaggedApi: constructor android.R.font()
+ UnflaggedApi: android.accessibilityservice.AccessibilityService#OVERLAY_RESULT_INTERNAL_ERROR:
+     New API must be flagged with @FlaggedApi: field android.accessibilityservice.AccessibilityService.OVERLAY_RESULT_INTERNAL_ERROR
+ UnflaggedApi: android.accessibilityservice.AccessibilityService#OVERLAY_RESULT_INVALID:
