@@ -1,8 +1,7 @@
-From aba38e267764c96aa4fb1066ec026cf6e7de37de Mon Sep 17 00:00:00 2001
+From 502201323f6768b4310f986696434f8581999f39 Mon Sep 17 00:00:00 2001
 From: MrTopia <redkarmakar@gmail.com>
 Date: Wed, 14 Aug 2024 14:18:23 +0530
-Subject: [PATCH] DNM: SystemUI: Add xiaomi fingerprintextension and
- touchfeature calls
+Subject: [PATCH] x
 
 ---
  packages/SystemUI/Android.bp                  |  2 +
@@ -11,12 +10,12 @@ Subject: [PATCH] DNM: SystemUI: Add xiaomi fingerprintextension and
  3 files changed, 60 insertions(+)
 
 diff --git a/packages/SystemUI/Android.bp b/packages/SystemUI/Android.bp
-index 6e0ad71..c633088 100644
+index 8f2e19766953..acedd0af0d42 100644
 --- a/packages/SystemUI/Android.bp
 +++ b/packages/SystemUI/Android.bp
 @@ -526,6 +526,8 @@ android_library {
          "device_policy_aconfig_flags_lib",
-         "vendor.lineage.powershare-V1.0-java",
+         "framework-derpfest.static",
          "bcsmartspace-google",
 +        "vendor.xiaomi.hardware.fingerprintextension-V1-java",
 +        "vendor.xiaomi.hw.touchfeature-V1-java"
@@ -24,7 +23,7 @@ index 6e0ad71..c633088 100644
      libs: [
          "keepanno-annotations",
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-index 36ed7ce..262a17c 100644
+index dc40ae5bb970..96257ce7edc8 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 @@ -128,6 +128,9 @@ import java.util.concurrent.Executor;
@@ -47,7 +46,7 @@ index 36ed7ce..262a17c 100644
      // Currently the UdfpsController supports a single UDFPS sensor. If devices have multiple
      // sensors, this, in addition to a lot of the code here, will be updated.
      @VisibleForTesting @NonNull FingerprintSensorPropertiesInternal mSensorProps;
-@@ -285,6 +291,50 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+@@ -282,6 +288,50 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                  }
              };
  
@@ -98,7 +97,7 @@ index 36ed7ce..262a17c 100644
      @Override
      public void dump(@NonNull PrintWriter pw, @NonNull String[] args) {
          final int touchConfigId = mContext.getResources().getInteger(
-@@ -1221,6 +1271,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+@@ -1160,6 +1210,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
              }
          }
  
@@ -108,22 +107,22 @@ index 36ed7ce..262a17c 100644
          for (Callback cb : mCallbacks) {
              cb.onFingerDown();
          }
-@@ -1275,6 +1328,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+@@ -1212,6 +1265,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         mOnFingerDown = false;
          unconfigureDisplay(view);
          cancelAodSendFingerUpAction();
- 
++        
 +        xaiomiTouchFeature(0);
 +        xiaomiFingerprintExtension(0);
-+
-         // Add a delay to ensure that the dim amount is updated after the display has had chance
-         // to switch out of HBM mode. The delay, in ms is stored in config_udfpsDimmingDisableDelay.
-         // If the delay is 0, the dim amount will be updated immediately.
+     }
+ 
+     /**
 diff --git a/services/core/Android.bp b/services/core/Android.bp
-index 4e2b649..0b907d2 100644
+index 7df2a75794ad..4fbf7065efe5 100644
 --- a/services/core/Android.bp
 +++ b/services/core/Android.bp
-@@ -230,6 +230,8 @@ java_library_static {
-         "powerstats_flags_lib",
+@@ -232,6 +232,8 @@ java_library_static {
+         "framework-derpfest.static",
          "vendor.aac.hardware.richtap.vibrator",
          "vendor.aospa.biometrics.face",
 +        "vendor.xiaomi.hardware.fingerprintextension-V1-java",
