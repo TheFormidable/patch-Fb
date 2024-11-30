@@ -1,8 +1,11 @@
-From 502201323f6768b4310f986696434f8581999f39 Mon Sep 17 00:00:00 2001
+From 7eb2798cfd4dcdde1b6bcf0061c3697130dc5690 Mon Sep 17 00:00:00 2001
 From: MrTopia <redkarmakar@gmail.com>
 Date: Wed, 14 Aug 2024 14:18:23 +0530
-Subject: [PATCH] x
+Subject: [PATCH] DNM: SystemUI: Add xiaomi fingerprintextension and
+ touchfeature calls  * before you bully me for this this only till i get fp
+ aidl done
 
+Change-Id: I7e14868f03c7417a413388b0ecb3ca8430165aed
 ---
  packages/SystemUI/Android.bp                  |  2 +
  .../systemui/biometrics/UdfpsController.java  | 56 +++++++++++++++++++
@@ -10,20 +13,20 @@ Subject: [PATCH] x
  3 files changed, 60 insertions(+)
 
 diff --git a/packages/SystemUI/Android.bp b/packages/SystemUI/Android.bp
-index 8f2e19766953..acedd0af0d42 100644
+index 7e591fc96125..9cf7b68cd6ef 100644
 --- a/packages/SystemUI/Android.bp
 +++ b/packages/SystemUI/Android.bp
-@@ -526,6 +526,8 @@ android_library {
+@@ -525,6 +525,8 @@ android_library {
+         "androidx.lifecycle_lifecycle-viewmodel-compose",
          "device_policy_aconfig_flags_lib",
          "framework-derpfest.static",
-         "bcsmartspace-google",
 +        "vendor.xiaomi.hardware.fingerprintextension-V1-java",
 +        "vendor.xiaomi.hw.touchfeature-V1-java"
      ],
      libs: [
          "keepanno-annotations",
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-index dc40ae5bb970..96257ce7edc8 100644
+index dc40ae5bb970..9f82dfc6b700 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 @@ -128,6 +128,9 @@ import java.util.concurrent.Executor;
@@ -111,7 +114,7 @@ index dc40ae5bb970..96257ce7edc8 100644
          mOnFingerDown = false;
          unconfigureDisplay(view);
          cancelAodSendFingerUpAction();
-+        
++
 +        xaiomiTouchFeature(0);
 +        xiaomiFingerprintExtension(0);
      }
